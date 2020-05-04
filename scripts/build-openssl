@@ -32,7 +32,7 @@ extract() {
 }
 
 if [ "`uname`" = "Linux" ]; then
-    outputdir=`pwd`/output
+    outputdir=/output
     outputfile=$outputdir/openssl-manylinux_$(uname -m).tar.bz2
 elif [ "`uname`" = "Darwin" ]; then
     outputdir=`pwd`/output
