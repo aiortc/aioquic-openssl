@@ -32,9 +32,11 @@ mkdir %destdir%\lib
 xcopy include %destdir%\include\ /E
 copy libcrypto.lib %destdir%\lib\
 copy libssl.lib %destdir%\lib\
+cd ..
 
 if not exist output (
     mkdir output
 )
 SET PATH=C:\Program Files\Git\usr\bin;%PATH%
 tar cjvf %outputfile% -C %destdir% include lib
+dir output
