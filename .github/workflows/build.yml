@@ -34,7 +34,7 @@ jobs:
         run: |
           pip install cibuildwheel
           cibuildwheel --output-dir output
-          rm -f output/*.whl
+          rm output/*.whl
       - name: Upload OpenSSL
         uses: actions/upload-artifact@v1
         with:
