@@ -1,5 +1,5 @@
 set destdir=%1
-set outputfile=output\openssl-win%PYTHON_ARCH%.tar.bz2
+set outputfile=output\openssl-win%PYTHON_ARCH%.tar.gz
 
 for %%d in (openssl %destdir%) do (
     if exist %%d (
@@ -38,5 +38,5 @@ if not exist output (
     mkdir output
 )
 SET PATH=C:\Program Files\Git\usr\bin;%PATH%
-tar cjvf %outputfile% -C %destdir% include lib
+tar czvf %outputfile% -C %destdir% include lib
 dir output

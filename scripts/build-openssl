@@ -33,10 +33,10 @@ extract() {
 
 if [ "`uname`" = "Linux" ]; then
     outputdir=/output
-    outputfile=$outputdir/openssl-manylinux_$(uname -m).tar.bz2
+    outputfile=$outputdir/openssl-manylinux_$(uname -m).tar.gz
 elif [ "`uname`" = "Darwin" ]; then
     outputdir=`pwd`/output
-    outputfile=$outputdir/openssl-macosx_$(uname -m).tar.bz2
+    outputfile=$outputdir/openssl-macosx_$(uname -m).tar.gz
 else
     echo "Unknown platform"
     exit 1
@@ -61,5 +61,5 @@ if [ ! -e $outputfile ]; then
     cp -R include $destdir
     cp libcrypto.a libssl.a $destdir/lib
     
-    tar cjvf $outputfile -C $destdir include lib
+    tar czvf $outputfile -C $destdir include lib
 fi
