@@ -19,7 +19,7 @@ call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliar
 SET PATH=%PATH%;C:\Program Files\NASM
 
 mkdir openssl
-curl -L https://www.openssl.org/source/openssl-1.1.1g.tar.gz -o openssl.tar.gz
+curl -L https://www.openssl.org/source/openssl-1.1.1i.tar.gz -o openssl.tar.gz
 tar xzf openssl.tar.gz -C openssl --strip-components 1
 cd openssl
 
