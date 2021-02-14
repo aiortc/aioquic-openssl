@@ -24,8 +24,12 @@ jobs:
            --installPath "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise" `
            --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --passive --norestart
         shell: powershell
+      - name: Install qemu
+        if: matrix.os == 'ubuntu-latest'
+        uses: docker/setup-qemu-action@v1
       - name: Build OpenSSL
         env:
+          CIBW_ARCHS_LINUX: auto aarch64
           CIBW_BEFORE_BUILD: scripts/build-openssl /tmp/vendor
           CIBW_BEFORE_BUILD_WINDOWS: scripts\build-openssl.bat C:\cibw\vendor
           CIBW_BUILD: cp38-*
