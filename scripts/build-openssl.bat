@@ -1,5 +1,4 @@
 set destdir=%1
-set outputfile=output\openssl-win%PYTHON_ARCH%.tar.gz
 
 for %%d in (openssl %destdir%) do (
     if exist %%d (
@@ -8,12 +7,15 @@ for %%d in (openssl %destdir%) do (
 )
 
 if %PYTHON_ARCH% == 64 (
-   set OPENSSL_CONFIG=VC-WIN64A
-   set VC_ARCH=x64
+    set platform=win_amd64
+    set OPENSSL_CONFIG=VC-WIN64A
+    set VC_ARCH=x64
 ) else (
-   set OPENSSL_CONFIG=VC-WIN32
-   set VC_ARCH=x86
+    set platform=win32
+    set OPENSSL_CONFIG=VC-WIN32
+    set VC_ARCH=x86
 )
+set outputfile=output\openssl-%platform%.tar.gz
 
 call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" %VC_ARCH%
 SET PATH=%PATH%;C:\Program Files\NASM
