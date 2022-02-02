@@ -47,7 +47,6 @@ jobs:
           CIBW_BEFORE_BUILD: python scripts/build-openssl.py /tmp/vendor
           CIBW_BEFORE_BUILD_WINDOWS: scripts\build-openssl.bat C:\cibw\vendor
           CIBW_BUILD: cp38-*
-          CIBW_ENVIRONMENT_MACOS: CFLAGS=-mmacosx-version-min=10.9
           CIBW_SKIP: '*-musllinux*'
           CIBW_TEST_COMMAND: python -c "import dummy"
         run: |
