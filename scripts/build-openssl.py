@@ -57,14 +57,19 @@ def extract(package, url, *, strip_components=1):
         run(["patch", "-d", path, "-i", patch, "-p1"])
 
 
-def run(cmd):
+def run(cmd, *, env=None):
     sys.stdout.write(f"- Running: {cmd}\n")
-    subprocess.run(cmd, check=True, stderr=sys.stderr.buffer, stdout=sys.stdout.buffer)
+    subprocess.run(
+        cmd, check=True, env=env, stderr=sys.stderr.buffer, stdout=sys.stdout.buffer
+    )
 
 
+configure_env = None
 output_dir = os.path.abspath("output")
 if platform.system() == "Linux":
     output_dir = "/output"
+elif platform.system() == "Darwin" and os.environ.get("ARCHFLAGS") == "-arch arm64":
+    configure_env = {"MACHINE": "arm64"}
 output_tarball = os.path.join(output_dir, f"openssl-{get_platform()}.tar.gz")
 
 for d in [build_dir, output_dir, source_dir]:
@@ -76,7 +81,7 @@ if not os.path.exists(output_tarball):
     # build openssl
     extract("openssl", "https://www.openssl.org/source/openssl-1.1.1m.tar.gz")
     os.chdir("openssl")
-    run(["./config", "no-comp", "no-shared", "no-tests"])
+    run(["./config", "no-comp", "no-shared", "no-tests"], env=configure_env)
     run(["make", "-j"])
     run(["make", "install_sw", "INSTALLTOP=" + dest_dir, "LIBDIR=lib"])
 
