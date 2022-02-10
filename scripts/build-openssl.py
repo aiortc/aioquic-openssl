@@ -83,7 +83,7 @@ if not os.path.exists(output_tarball):
     extract("openssl", "https://www.openssl.org/source/openssl-3.1.4.tar.gz")
     os.chdir("openssl")
     run(["./config"] + configure_args + ["no-comp", "no-shared", "no-tests"])
-    run(["make", "-j"])
+    run(["make"])
     run(["make", "install_sw", "INSTALLTOP=" + dest_dir, "LIBDIR=lib"])
 
     run(["tar", "czvf", output_tarball, "-C", dest_dir, "include", "lib"])
