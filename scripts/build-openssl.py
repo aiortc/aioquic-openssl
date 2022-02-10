@@ -14,9 +14,10 @@ build_dir = os.path.abspath("build")
 patch_dir = os.path.abspath("patches")
 source_dir = os.path.abspath("source")
 
-for d in [build_dir, dest_dir]:
-    if os.path.exists(d):
-        shutil.rmtree(d)
+# parallelize build, except when running in qemu
+make_args = []
+if platform.machine() != "aarch64":
+    make_args.append("-j")
 
 
 def get_platform():
@@ -59,9 +60,8 @@ def extract(package, url, *, strip_components=1):
 
 def run(cmd, *, env=None):
     sys.stdout.write(f"- Running: {cmd}\n")
-    subprocess.run(
-        cmd, check=True, env=env, stderr=sys.stderr.buffer, stdout=sys.stdout.buffer
-    )
+    sys.stdout.flush()
+    subprocess.run(cmd, check=True, env=env)
 
 
 configure_args = []
@@ -73,9 +73,13 @@ elif platform.system() == "Darwin" and os.environ.get("ARCHFLAGS") == "-arch arm
     configure_args = ["darwin64-arm64"]
 output_tarball = os.path.join(output_dir, f"openssl-{get_platform()}.tar.gz")
 
+for d in [build_dir, dest_dir]:
+    if os.path.exists(d):
+        shutil.rmtree(d)
 for d in [build_dir, output_dir, source_dir]:
     if not os.path.exists(d):
         os.mkdir(d)
+
 if not os.path.exists(output_tarball):
     os.chdir(build_dir)
 
