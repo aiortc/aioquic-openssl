@@ -26,19 +26,12 @@ jobs:
       - uses: actions/setup-python@v1
         with:
           python-version: 3.8
-      - name: Install nasm
-        if: matrix.os == 'windows-latest'
-        run: choco install -y nasm
-      - name: Install nmake
-        if: matrix.os == 'windows-latest'
-        run: |
-          & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vs_installer.exe" modify `
-           --installPath "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise" `
-           --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --passive --norestart
-        shell: powershell
       - name: Install qemu
         if: matrix.os == 'ubuntu-latest'
         uses: docker/setup-qemu-action@v1
+      - name: Install nasm
+        if: matrix.os == 'windows-latest'
+        run: choco install -y nasm
       - name: Build OpenSSL
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
