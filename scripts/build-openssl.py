@@ -64,12 +64,13 @@ def run(cmd, *, env=None):
     )
 
 
-configure_env = None
+configure_args = []
 output_dir = os.path.abspath("output")
-if platform.system() == "Linux":
+if platform.system() == "Linux" and os.environ.get("CIBUILDWHEEL") == "1":
     output_dir = "/output"
+    run(["yum", "-y", "install", "perl-IPC-Cmd"])
 elif platform.system() == "Darwin" and os.environ.get("ARCHFLAGS") == "-arch arm64":
-    configure_env = {"MACHINE": "arm64"}
+    configure_args = ["darwin64-arm64"]
 output_tarball = os.path.join(output_dir, f"openssl-{get_platform()}.tar.gz")
 
 for d in [build_dir, output_dir, source_dir]:
@@ -79,9 +80,9 @@ if not os.path.exists(output_tarball):
     os.chdir(build_dir)
 
     # build openssl
-    extract("openssl", "https://www.openssl.org/source/openssl-1.1.1m.tar.gz")
+    extract("openssl", "https://www.openssl.org/source/openssl-3.1.4.tar.gz")
     os.chdir("openssl")
-    run(["./config", "no-comp", "no-shared", "no-tests"], env=configure_env)
+    run(["./config"] + configure_args + ["no-comp", "no-shared", "no-tests"])
     run(["make", "-j"])
     run(["make", "install_sw", "INSTALLTOP=" + dest_dir, "LIBDIR=lib"])
 
