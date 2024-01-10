@@ -25,7 +25,7 @@ curl -L https://www.openssl.org/source/openssl-3.1.4.tar.gz -o openssl.tar.gz
 tar xzf openssl.tar.gz -C openssl --strip-components 1
 cd openssl
 
-perl Configure no-comp no-shared no-tests %OPENSSL_CONFIG%
+perl Configure no-comp no-dso no-shared no-tests %OPENSSL_CONFIG%
 nmake
 
 mkdir %destdir%
