@@ -25,10 +25,6 @@ def get_platform():
     if system == "Linux":
         return f"manylinux_{machine}"
     elif system == "Darwin":
-        # cibuildwheel sets ARCHFLAGS:
-        # https://github.com/pypa/cibuildwheel/blob/5255155bc57eb6224354356df648dc42e31a0028/cibuildwheel/macos.py#L207-L220
-        if "ARCHFLAGS" in os.environ:
-            machine = os.environ["ARCHFLAGS"].split()[1]
         return f"macosx_{machine}"
     elif system == "Windows":
         if struct.calcsize("P") * 8 == 64:
@@ -69,8 +65,6 @@ output_dir = os.path.abspath("output")
 if platform.system() == "Linux" and os.environ.get("CIBUILDWHEEL") == "1":
     output_dir = "/output"
     run(["yum", "-y", "install", "perl-IPC-Cmd"])
-elif platform.system() == "Darwin" and os.environ.get("ARCHFLAGS") == "-arch arm64":
-    configure_args = ["darwin64-arm64"]
 output_tarball = os.path.join(output_dir, f"openssl-{get_platform()}.tar.gz")
 
 for d in [build_dir, output_dir, source_dir]:
@@ -80,7 +74,7 @@ if not os.path.exists(output_tarball):
     os.chdir(build_dir)
 
     # build openssl
-    extract("openssl", "https://www.openssl.org/source/openssl-3.2.1.tar.gz")
+    extract("openssl", "https://www.openssl.org/source/openssl-3.3.0.tar.gz")
     os.chdir("openssl")
     run(["./config"] + configure_args + ["no-apps", "no-comp", "no-dso", "no-shared", "no-tests"])
     run(["make"])
