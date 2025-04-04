@@ -81,7 +81,7 @@ if not os.path.exists(output_tarball):
     os.chdir(build_dir)
 
     # build openssl
-    extract("openssl", "https://www.openssl.org/source/openssl-3.4.0.tar.gz")
+    extract("openssl", "https://www.openssl.org/source/openssl-3.4.1.tar.gz")
     os.chdir("openssl")
     run(["./config"] + configure_args + ["no-apps", "no-comp", "no-dso", "no-shared", "no-tests"])
     run(["make"])
