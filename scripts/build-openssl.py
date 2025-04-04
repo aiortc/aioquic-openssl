@@ -23,7 +23,10 @@ def get_platform():
     system = platform.system()
     machine = platform.machine()
     if system == "Linux":
-        return f"manylinux_{machine}"
+        if platform.libc_ver()[0] == "glibc":
+            return f"manylinux_{machine}"
+        else:
+            return f"musllinux_{machine}"
     elif system == "Darwin":
         return f"macosx_{machine}"
     elif system == "Windows":
@@ -64,7 +67,11 @@ configure_args = []
 output_dir = os.path.abspath("output")
 if platform.system() == "Linux" and os.environ.get("CIBUILDWHEEL") == "1":
     output_dir = "/output"
-    run(["yum", "-y", "install", "perl-IPC-Cmd"])
+    try:
+        run(["yum", "-y", "install", "perl-IPC-Cmd"])
+    except Exception:
+        # Alpine Linux doesn't use yum.
+        pass
 output_tarball = os.path.join(output_dir, f"openssl-{get_platform()}.tar.gz")
 
 for d in [build_dir, output_dir, source_dir]:

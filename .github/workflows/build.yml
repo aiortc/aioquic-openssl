@@ -37,7 +37,6 @@ jobs:
           CIBW_BEFORE_BUILD: python scripts/build-openssl.py /tmp/vendor
           CIBW_BEFORE_BUILD_WINDOWS: scripts\build-openssl.bat C:\cibw\vendor
           CIBW_BUILD: cp39-*
-          CIBW_SKIP: '*-musllinux*'
           CIBW_TEST_COMMAND: python -c "import dummy"
         run: |
           pip install cibuildwheel
