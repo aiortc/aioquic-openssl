@@ -6,7 +6,11 @@ for %%d in (openssl %destdir%) do (
     )
 )
 
-if %PYTHON_ARCH% == 64 (
+if %PYTHON_ARCH% == ARM64 (
+    set platform=win_arm64
+    set OPENSSL_CONFIG=VC-WIN64-ARM
+    set VC_ARCH=ARM64
+) else if %PYTHON_ARCH% == 64 (
     set platform=win_amd64
     set OPENSSL_CONFIG=VC-WIN64A
     set VC_ARCH=x64
