@@ -1,6 +1,21 @@
 name: build
 
-on: [push, pull_request]
+on:
+  push:
+    branches: main
+    paths-ignore:
+      - '**.md'
+      - '**.rst'
+      - '**.txt'
+  pull_request:
+    branches: main
+    paths-ignore:
+      - '**.md'
+      - '**.rst'
+      - '**.txt'
+  release:
+    types: [published]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -11,7 +26,7 @@ jobs:
         include:
           - os: macos-14
             arch: arm64
-          - os: macos-13
+          - os: macos-15
             arch: x86_64
           - os: ubuntu-24.04-arm
             arch: aarch64
@@ -26,8 +41,8 @@ jobs:
           - os: windows-11-arm
             arch: ARM64
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: 3.11
       - name: Install nasm
@@ -45,7 +60,61 @@ jobs:
           cibuildwheel --output-dir output
           rm output/*.whl
       - name: Upload OpenSSL
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: output-${{ matrix.os }}-${{ matrix.arch }}
           path: output/
+
+  cross-build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build: [ "manylinux_", "musllinux_" ]
+        # arch: [ "loongarch64", "ppc64le", "riscv64", "s390x" ]
+        arch: [ "ppc64le" ]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - uses: docker/setup-qemu-action@v4
+      - name: Build OpenSSL
+        env:
+          CIBW_ARCHS: ${{ matrix.arch }}
+          CIBW_BEFORE_ALL_LINUX: ./scripts/install-static-clang.sh
+          CIBW_BEFORE_BUILD_LINUX: python scripts/build-openssl.py /tmp/vendor
+          CIBW_BUILD: cp39-${{ matrix.build }}${{ matrix.arch }}
+          CIBW_ENVIRONMENT_LINUX: >
+            CC="/opt/clang/bin/clang"
+            CXX="/opt/clang/bin/clang++"
+            LDFLAGS="-fuse-ld=lld"
+          CIBW_ENVIRONMENT_PASS_LINUX: RUNNER_ARCH
+          CIBW_TEST_COMMAND: python -c "import dummy"
+        run: |
+          pip install cibuildwheel
+          cibuildwheel --output-dir output
+          rm output/*.whl
+      - name: Upload OpenSSL
+        uses: actions/upload-artifact@v6
+        with:
+          name: output-${{ matrix.build }}${{ matrix.arch }}
+          path: output/
+
+  upload-release:
+    if: github.event_name == 'release'
+    needs: [build, cross-build]
+    runs-on: ubuntu-slim
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v6
+        with:
+          path: artifacts/
+          pattern: output-*
+          merge-multiple: true
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*.tar.gz
